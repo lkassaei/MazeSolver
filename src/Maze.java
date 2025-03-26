@@ -147,6 +147,9 @@ public class Maze {
      */
     public boolean isValidCell(int row, int col) {
         // TODO: Complete this function
-        return true;
+        // Get the cell we want to check
+        MazeCell cell = mazeGrid[row][col];
+        // If the cell is not a wall and has not been explored then return true (else return false)
+        return !cell.isWall() && !cell.isExplored();
     }
 }

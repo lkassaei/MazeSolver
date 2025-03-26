@@ -5,6 +5,7 @@
  */
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class MazeSolver {
     private Maze maze;
@@ -29,7 +30,28 @@ public class MazeSolver {
     public ArrayList<MazeCell> getSolution() {
         // TODO: Get the solution from the maze
         // Should be from start to end cells
-        return null;
+
+        // Create an Array List to track the solution
+        ArrayList<MazeCell> arr = new ArrayList<MazeCell>();
+        // Start at the end
+        MazeCell current = maze.getEndCell();
+        //Create a stack to reverse the path
+        Stack<MazeCell> stack = new Stack<MazeCell>();
+        // While we have not finished the maze yet
+        while (!current.equals(maze.getStartCell())) {
+            // Add step to the stack
+            stack.push(current);
+            // Keep on going up
+            current = current.getParent();
+        }
+        // Push the starting cell as well
+        stack.push(current);
+        // Reverse the path
+        while (!stack.empty()) {
+            arr.add(stack.pop());
+        }
+        // Return the solution
+        return arr;
     }
 
     /**
@@ -39,6 +61,52 @@ public class MazeSolver {
     public ArrayList<MazeCell> solveMazeDFS() {
         // TODO: Use DFS to solve the maze
         // Explore the cells in the order: NORTH, EAST, SOUTH, WEST
+
+        // Create place to store explored cells
+        ArrayList<MazeCell> explored = new ArrayList<MazeCell>();
+
+        // Create stack to implement DFS
+        Stack<MazeCell> toVisit = new Stack<MazeCell>();
+
+        // Start at the starting point
+        MazeCell start = maze.getStartCell();
+        explored.add(start);
+        toVisit.push(start);
+
+        // Go through the maze
+        while (!toVisit.empty()) {
+            // Find current cell
+            MazeCell current = toVisit.pop();
+
+            // If the current cell is at the end, we are done and can return the solution
+            if (current.equals(maze.getEndCell())) {
+                return getSolution();
+            }
+
+            // Get row and col of current cell
+            int row = current.getRow();
+            int col = current.getCol();
+
+            // Find all neighbors of cell
+            ArrayList<MazeCell> neighbors = new ArrayList<MazeCell>();
+            neighbors.add(maze.getCell(row + 1, col)); // North
+            neighbors.add(maze.getCell(row, col + 1)); // East
+            neighbors.add(maze.getCell(row - 1, col)); // South
+            neighbors.add(maze.getCell(row, col - 1)); // West
+
+            // Go through all neighbors
+            for (MazeCell neighbor: neighbors) {
+                // If it is a valid cell and has not been explored before
+                if (neighbor != null && maze.isValidCell(neighbor.getRow(), neighbor.getCol())) {
+                    // Add neighbor to explored, toVisit
+                    toVisit.push(neighbor);
+                    explored.add(neighbor);
+                    // Make sure its parent cell is accurate
+                    neighbor.setParent(current);
+                }
+            }
+        }
+        // If no solution is found return null
         return null;
     }
 
