@@ -1,6 +1,6 @@
 /**
  * Solves the given maze using DFS or BFS
- * @author Ms. Namasivayam
+ * @author Ms. Namasivayam and Lily Kassaei
  * @version 03/10/2023
  */
 
