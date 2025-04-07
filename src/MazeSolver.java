@@ -5,6 +5,8 @@
  */
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Stack;
 
 public class MazeSolver {
@@ -62,15 +64,11 @@ public class MazeSolver {
         // TODO: Use DFS to solve the maze
         // Explore the cells in the order: NORTH, EAST, SOUTH, WEST
 
-        // Create place to store explored cells
-        ArrayList<MazeCell> explored = new ArrayList<MazeCell>();
-
         // Create stack to implement DFS
         Stack<MazeCell> toVisit = new Stack<MazeCell>();
 
         // Start at the starting point
         MazeCell start = maze.getStartCell();
-        explored.add(start);
         toVisit.push(start);
 
         // Go through the maze
@@ -89,19 +87,28 @@ public class MazeSolver {
 
             // Find all neighbors of cell
             ArrayList<MazeCell> neighbors = new ArrayList<MazeCell>();
-            neighbors.add(maze.getCell(row + 1, col)); // North
-            neighbors.add(maze.getCell(row, col + 1)); // East
-            neighbors.add(maze.getCell(row - 1, col)); // South
-            neighbors.add(maze.getCell(row, col - 1)); // West
+            // Because stacks are a LIFO datatype, we must add neighbors in reverse order to explore in the right order
+            if (maze.isValidCell(row, col - 1)) {
+                neighbors.add(maze.getCell(row, col - 1)); // West
+            }
+            if (maze.isValidCell(row - 1, col)) {
+                neighbors.add(maze.getCell(row - 1, col)); // South
+            }
+            if (maze.isValidCell(row, col + 1)) {
+                neighbors.add(maze.getCell(row, col + 1)); // East
+            }
+            if (maze.isValidCell(row + 1, col)) {
+                neighbors.add(maze.getCell(row + 1, col)); // North
+            }
 
             // Go through all neighbors
             for (MazeCell neighbor: neighbors) {
                 // If it is a valid cell and has not been explored before
                 if (neighbor != null && maze.isValidCell(neighbor.getRow(), neighbor.getCol())) {
-                    // Add neighbor to explored, toVisit
+                    // Add neighbor to toVisit
                     toVisit.push(neighbor);
-                    explored.add(neighbor);
-                    // Make sure its parent cell is accurate
+                    // Make sure its parent cell is accurate and that it is marked as explored
+                    neighbor.setExplored(true);
                     neighbor.setParent(current);
                 }
             }
@@ -117,6 +124,57 @@ public class MazeSolver {
     public ArrayList<MazeCell> solveMazeBFS() {
         // TODO: Use BFS to solve the maze
         // Explore the cells in the order: NORTH, EAST, SOUTH, WEST
+
+        // Create stack to implement DFS
+        Queue<MazeCell> toVisit = new LinkedList<>();
+
+        // Start at the starting point
+        MazeCell start = maze.getStartCell();
+        toVisit.add(start);
+
+        // Go through the maze
+        while (!toVisit.isEmpty()) {
+            // Find current cell
+            MazeCell current = toVisit.remove();
+
+            // If the current cell is at the end, we are done and can return the solution
+            if (current.equals(maze.getEndCell())) {
+                return getSolution();
+            }
+
+            // Get row and col of current cell
+            int row = current.getRow();
+            int col = current.getCol();
+
+            // Find all neighbors of cell
+            // Find all neighbors of cell
+            ArrayList<MazeCell> neighbors = new ArrayList<MazeCell>();
+            if (maze.isValidCell(row + 1, col)) {
+                neighbors.add(maze.getCell(row + 1, col)); // North
+            }
+            if (maze.isValidCell(row, col + 1)) {
+                neighbors.add(maze.getCell(row, col + 1)); // East
+            }
+            if (maze.isValidCell(row - 1, col)) {
+                neighbors.add(maze.getCell(row - 1, col)); // South
+            }
+            if (maze.isValidCell(row, col - 1)) {
+                neighbors.add(maze.getCell(row, col - 1)); // West
+            }
+
+            // Go through all neighbors
+            for (MazeCell neighbor: neighbors) {
+                // If it is a valid cell and has not been explored before
+                if (neighbor != null && maze.isValidCell(neighbor.getRow(), neighbor.getCol())) {
+                    // Add neighbor to toVisit
+                    toVisit.add(neighbor);
+                    // Make sure its parent cell is accurate and that it is marked as explored
+                    neighbor.setExplored(true);
+                    neighbor.setParent(current);
+                }
+            }
+        }
+        // If no solution is found return null
         return null;
     }
 
